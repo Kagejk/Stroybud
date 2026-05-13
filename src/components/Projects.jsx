@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react'
+import { useRef, useState, useEffect, useCallback } from 'react'
 import ProjectModal from './ProjectModal'
 
 const projects = [
@@ -53,10 +53,9 @@ const projects = [
   },
 ]
 
-const doubled = [...projects, ...projects]
-
-const SPEED = 0.4       // px per frame
-const CLICK_THRESHOLD = 5 // px — менше цього = клік, більше = drag
+const N       = projects.length                              // 7
+const STEP    = 288 + 24                                    // CARD_W + GAP = 312
+const tripled = [...projects, ...projects, ...projects]     // 21 карток
 
 function ProjectCard({ project, onClick }) {
   return (
@@ -64,7 +63,6 @@ function ProjectCard({ project, onClick }) {
       onClick={onClick}
       className="w-72 flex-none group rounded-xl overflow-hidden border border-brand-muted hover:border-brand-yellow transition-colors duration-300 cursor-pointer"
     >
-      {/* Photo */}
       <div className="relative w-full h-52 overflow-hidden bg-brand-dark">
         <img
           src={project.img}
@@ -77,13 +75,11 @@ function ProjectCard({ project, onClick }) {
           <h3 className="text-white font-bold text-sm">{project.title}</h3>
           {project.area !== '—' && <p className="text-gray-300 text-xs mt-1">{project.area}</p>}
         </div>
-        {/* "Читати більше" hint */}
         <div className="absolute top-3 right-3 bg-brand-yellow text-brand-dark text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200">
           Детальніше →
         </div>
       </div>
 
-      {/* Info */}
       <div className="p-4 bg-brand-gray">
         <div className="flex items-center justify-between gap-2 mb-2">
           <span className="inline-block text-brand-yellow text-xs font-medium bg-brand-yellow/10 px-2 py-1 rounded">
@@ -101,79 +97,117 @@ function ProjectCard({ project, onClick }) {
 }
 
 export default function Projects() {
-  const trackRef  = useRef(null)
-  const rafRef    = useRef(null)
-  const drag      = useRef({ active: false, startX: 0, scrollStart: 0, moved: false })
-  const [selected, setSelected] = useState(null)
+  const trackRef   = useRef(null)
+  const drag       = useRef({ active: false, startX: 0, scrollStart: 0, moved: false })
+  const idxRef     = useRef(N)   // mutable ref — no stale closure in scrollToIdx
+  const [activeIdx, setActiveIdx] = useState(N)
+  const [selected,  setSelected]  = useState(null)
 
+  const setIdx = (i) => { idxRef.current = i; setActiveIdx(i) }
+
+  // Start in the middle copy (index N=7) so both directions have room
   useEffect(() => {
-    const el = trackRef.current
-    if (!el) return
-    const tick = () => {
-      if (!drag.current.active) {
-        el.scrollLeft += SPEED
-        if (el.scrollLeft >= el.scrollWidth / 2) {
-          el.scrollLeft -= el.scrollWidth / 2
-        }
-      }
-      rafRef.current = requestAnimationFrame(tick)
-    }
-    rafRef.current = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(rafRef.current)
+    if (trackRef.current) trackRef.current.scrollLeft = N * STEP
   }, [])
 
+  const scrollToIdx = useCallback((target) => {
+    const el = trackRef.current
+    if (!el) return
+    const from = idxRef.current
+    let to = target
+
+    // Crossed left edge of middle copy → instant-jump to equivalent in right copy
+    if (to < N) {
+      el.scrollLeft = (from + N) * STEP  // invisible same-card reposition
+      to = to + N
+    }
+    // Crossed right edge of middle copy → instant-jump to equivalent in left copy
+    else if (to >= N * 2) {
+      el.scrollLeft = (from - N) * STEP  // invisible same-card reposition
+      to = to - N
+    }
+
+    el.scrollTo({ left: to * STEP, behavior: 'smooth' })
+    setIdx(to)
+  }, [])
+
+  const prev = () => scrollToIdx(idxRef.current - 1)
+  const next = () => scrollToIdx(idxRef.current + 1)
+
+  // Drag
   const startDrag = (x) => {
     drag.current = { active: true, startX: x, scrollStart: trackRef.current.scrollLeft, moved: false }
     trackRef.current.style.cursor = 'grabbing'
   }
-
   const moveDrag = (x) => {
     if (!drag.current.active) return
     const dx = x - drag.current.startX
-    if (Math.abs(dx) > CLICK_THRESHOLD) drag.current.moved = true
+    if (Math.abs(dx) > 5) drag.current.moved = true
     trackRef.current.scrollLeft = drag.current.scrollStart - dx
   }
-
   const endDrag = () => {
     if (!drag.current.active) return
     drag.current.active = false
+    if (trackRef.current) trackRef.current.style.cursor = 'grab'
     const el = trackRef.current
-    if (!el) return
-    el.style.cursor = 'grab'
-    const half = el.scrollWidth / 2
-    if (el.scrollLeft >= half) el.scrollLeft -= half
-    if (el.scrollLeft < 0)    el.scrollLeft += half
+    if (!el || !drag.current.moved) return
+    const nearest = Math.max(0, Math.min(Math.round(el.scrollLeft / STEP), N * 3 - 1))
+    el.scrollTo({ left: nearest * STEP, behavior: 'smooth' })
+    setIdx(nearest)
   }
 
-  // Клік по картці спрацьовує тільки якщо не було drag
   const handleCardClick = (project) => {
     if (!drag.current.moved) setSelected(project)
   }
 
+  const realIdx = activeIdx % N  // 0–6 for display
+
   return (
     <section id="projects" className="py-16 md:py-24 bg-brand-gray overflow-hidden">
 
-      {/* Header */}
+      {/* Header row */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-10 md:mb-16">
-          <span className="text-brand-yellow text-sm font-semibold uppercase tracking-widest">Портфоліо</span>
-          <h2 className="section-heading mt-2">Наші проєкти</h2>
-          <p className="section-subheading mx-auto">
-            Натисніть на кейс, щоб дізнатися більше та залишити заявку.
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10 md:mb-14">
+          <div>
+            <span className="text-brand-yellow text-sm font-semibold uppercase tracking-widest">Портфоліо</span>
+            <h2 className="section-heading mt-2">Наші проєкти</h2>
+            <p className="section-subheading">
+              Натисніть на кейс, щоб дізнатися більше.
+            </p>
+          </div>
+
+          {/* Arrows + counter */}
+          <div className="flex items-center gap-3 flex-shrink-0">
+            <span className="text-gray-500 text-sm mr-1">
+              {realIdx + 1} / {N}
+            </span>
+            <button
+              onClick={prev}
+              className="w-11 h-11 rounded-full border border-brand-muted flex items-center justify-center text-white hover:bg-brand-yellow hover:text-brand-dark hover:border-brand-yellow transition-colors"
+              aria-label="Попередній"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <button
+              onClick={next}
+              className="w-11 h-11 rounded-full border border-brand-muted flex items-center justify-center text-white hover:bg-brand-yellow hover:text-brand-dark hover:border-brand-yellow transition-colors"
+              aria-label="Наступний"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Infinite slider */}
-      <div
-        style={{
-          maskImage: 'linear-gradient(to right, transparent, black 6%, black 94%, transparent)',
-          WebkitMaskImage: 'linear-gradient(to right, transparent, black 6%, black 94%, transparent)',
-        }}
-      >
+      {/* Track */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div
           ref={trackRef}
-          className="flex gap-6 overflow-x-scroll [scrollbar-width:none] [&::-webkit-scrollbar]:hidden cursor-grab select-none px-3 py-2"
+          className="flex gap-6 overflow-x-scroll [scrollbar-width:none] [&::-webkit-scrollbar]:hidden cursor-grab select-none py-2"
           onMouseDown={e => startDrag(e.pageX)}
           onMouseMove={e => moveDrag(e.pageX)}
           onMouseUp={endDrag}
@@ -182,7 +216,7 @@ export default function Projects() {
           onTouchMove={e => { e.preventDefault(); moveDrag(e.touches[0].pageX) }}
           onTouchEnd={endDrag}
         >
-          {doubled.map((project, i) => (
+          {tripled.map((project, i) => (
             <ProjectCard
               key={i}
               project={project}
@@ -190,6 +224,22 @@ export default function Projects() {
             />
           ))}
         </div>
+      </div>
+
+      {/* Dots */}
+      <div className="flex justify-center gap-2 mt-6">
+        {projects.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => scrollToIdx(idxRef.current - realIdx + i)}
+            className={`rounded-full transition-all duration-200 ${
+              i === realIdx
+                ? 'w-6 h-2.5 bg-brand-yellow'
+                : 'w-2.5 h-2.5 bg-gray-600 hover:bg-gray-400'
+            }`}
+            aria-label={`Проєкт ${i + 1}`}
+          />
+        ))}
       </div>
 
       <ProjectModal project={selected} onClose={() => setSelected(null)} />

@@ -56,7 +56,7 @@ export default function Hero({ onOpenModal }) {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 border border-white/20 bg-black/40 text-white text-xs font-semibold px-4 py-2 rounded-full uppercase tracking-widest mb-8">
             <span className="w-2 h-2 bg-brand-yellow rounded-full animate-pulse flex-shrink-0" />
-            Працюємо по Київській області та місто Первомайськ
+            Працюємо по всій Україні
           </div>
 
           {/* Main heading */}
@@ -102,7 +102,7 @@ export default function Hero({ onOpenModal }) {
               </svg>
             </button>
             <a
-              href="tel:+380000000000"
+              href="tel:+380960600060"
               className="inline-flex items-center justify-center gap-2 border border-white/25 bg-black/40 text-brand-yellow font-bold px-7 py-4 rounded-md hover:border-brand-yellow/60 transition-colors duration-200 text-base"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -101,7 +101,7 @@ export default function About() {
 
             {/* Phone CTA */}
             <a
-              href="tel:+380XXXXXXXXX"
+              href="tel:+380960600060"
               className="inline-flex items-center gap-3 bg-brand-yellow/10 border border-brand-yellow/30 hover:bg-brand-yellow hover:border-brand-yellow text-brand-yellow hover:text-brand-dark rounded-xl px-5 py-3 transition-colors duration-200 mb-8 group"
             >
               <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -111,7 +111,7 @@ export default function About() {
               </svg>
               <div>
                 <div className="text-xs font-medium opacity-70 group-hover:opacity-100">Зателефонуйте нам</div>
-                <div className="text-base font-bold leading-tight">+380 XX XXX XX XX</div>
+                <div className="text-base font-bold leading-tight">+380 96 060 00 60</div>
               </div>
             </a>
 

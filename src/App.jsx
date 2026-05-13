@@ -5,7 +5,7 @@ import About from './components/About'
 import Services from './components/Services'
 import Advantages from './components/Advantages'
 import WorkSteps from './components/WorkSteps'
-import Reviews from './components/Reviews'
+import BeforeAfter from './components/BeforeAfter'
 import LeadBanner from './components/LeadBanner'
 import FAQ from './components/FAQ'
 import Projects from './components/Projects'
@@ -24,7 +24,7 @@ export default function App() {
         <Services />
         <Advantages />
         <WorkSteps />
-        <Reviews />
+        <BeforeAfter />
         <LeadBanner />
         <FAQ />
         <Projects />
