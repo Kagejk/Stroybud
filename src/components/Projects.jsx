@@ -1,56 +1,117 @@
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useState } from 'react'
+import ProjectModal from './ProjectModal'
 
 const projects = [
-  { title: 'Асфальтування міського двору',     category: 'Двори',         area: '1 200 м²', placeholder: '🏙️' },
-  { title: 'Парковка торгового центру',         category: 'Парковки',      area: '3 500 м²', placeholder: '🛒' },
-  { title: 'Під\'їзна дорога до підприємства', category: 'Дороги',        area: '2 800 м²', placeholder: '🏭' },
-  { title: 'Ямковий ремонт вулиць',            category: 'Ремонт',        area: '400 м²',   placeholder: '🔨' },
-  { title: 'Тротуарна плитка в парку',          category: 'Благоустрій',   area: '900 м²',   placeholder: '🌳' },
-  { title: 'Промисловий майданчик',            category: 'Промисловість', area: '5 000 м²', placeholder: '🏗️' },
+  {
+    title: 'Асфальтування складського приміщення',
+    category: 'Промисловість',
+    area: '4 000 м²',
+    img: '/images/склад.jpg',
+    desc: 'Підготовка основи та укладання асфальтобетонного покриття для промислового складу. Рівне, міцне та зносостійке покриття для інтенсивного руху техніки.',
+  },
+  {
+    title: 'Фрезерування та підготовка основи',
+    category: 'Ремонт',
+    area: '—',
+    img: '/images/підготовка.jpg',
+    desc: 'Фрезерування існуючого покриття з підготовкою основи. Очищення дорожнього полотна та профілювання для якісного зчеплення нового шару асфальту.',
+  },
+  {
+    title: 'Асфальтування дорожньої ділянки',
+    category: 'Дороги',
+    area: '3 000 м²',
+    img: '/images/3000.JPG',
+    desc: 'Укладання нового асфальтобетонного покриття: підготовка основи, обробка бітумною емульсією, укладання асфальту, ущільнення котками.',
+  },
+  {
+    title: 'Покриття з асфальтної крихти',
+    category: 'Дороги',
+    area: '4 км',
+    img: '/images/Дорожня крихта.jpg',
+    desc: 'Влаштування дорожнього покриття під ключ: планування основи, встановлення бордюрів, ущільнення щебеневої подушки та укладання асфальтної крихти.',
+  },
+  {
+    title: 'Асфальтування комерційного об\'єкта',
+    category: 'Парковки',
+    area: '1 500 м²',
+    img: '/images/атб парковка.jpg',
+    desc: 'Комплекс робіт з асфальтування та благоустрою: підготовка основи, укладання покриття, організація під\'їзних зон і паркування.',
+  },
+  {
+    title: 'Облаштування сільгосппідприємства',
+    category: 'Промисловість',
+    area: '12 000 м²',
+    img: '/images/12000.jpg',
+    desc: 'Асфальтування під\'їздів до складів, маневрових зон та внутрішніх проїздів з урахуванням навантажень важкої сільгосптехніки.',
+  },
+  {
+    title: 'Укладання бруківки',
+    category: 'Благоустрій',
+    area: '2 000 м²',
+    img: '/images/Pavers.jpg',
+    desc: 'Облаштування пішохідних і під\'їзних зон тротуарною бруківкою. Підготовка основи, встановлення бордюрів, укладання та ущільнення бруківки з дотриманням ухилів для відведення води.',
+  },
 ]
 
 const doubled = [...projects, ...projects]
 
-function ProjectCard({ project }) {
+const SPEED = 0.4       // px per frame
+const CLICK_THRESHOLD = 5 // px — менше цього = клік, більше = drag
+
+function ProjectCard({ project, onClick }) {
   return (
-    <div className="w-72 flex-none group rounded-xl overflow-hidden border border-brand-muted hover:border-brand-yellow transition-colors duration-300">
-      <div className="w-full h-52 bg-brand-dark flex flex-col items-center justify-center relative">
-        <span className="text-5xl mb-3">{project.placeholder}</span>
-        <p className="text-gray-500 text-xs text-center px-4">
-          Замініть на фото<br />~600×400px
-        </p>
+    <div
+      onClick={onClick}
+      className="w-72 flex-none group rounded-xl overflow-hidden border border-brand-muted hover:border-brand-yellow transition-colors duration-300 cursor-pointer"
+    >
+      {/* Photo */}
+      <div className="relative w-full h-52 overflow-hidden bg-brand-dark">
+        <img
+          src={project.img}
+          alt={project.title}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          draggable="false"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-brand-dark/90 via-brand-dark/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
           <span className="text-brand-yellow text-xs font-semibold uppercase tracking-wider mb-1">{project.category}</span>
           <h3 className="text-white font-bold text-sm">{project.title}</h3>
-          <p className="text-gray-300 text-xs mt-1">Площа: {project.area}</p>
+          {project.area !== '—' && <p className="text-gray-300 text-xs mt-1">{project.area}</p>}
+        </div>
+        {/* "Читати більше" hint */}
+        <div className="absolute top-3 right-3 bg-brand-yellow text-brand-dark text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+          Детальніше →
         </div>
       </div>
+
+      {/* Info */}
       <div className="p-4 bg-brand-gray">
-        <span className="inline-block text-brand-yellow text-xs font-medium bg-brand-yellow/10 px-2 py-1 rounded mb-2">
-          {project.category}
-        </span>
-        <h3 className="text-white text-sm font-semibold">{project.title}</h3>
-        <p className="text-gray-500 text-xs mt-1">{project.area}</p>
+        <div className="flex items-center justify-between gap-2 mb-2">
+          <span className="inline-block text-brand-yellow text-xs font-medium bg-brand-yellow/10 px-2 py-1 rounded">
+            {project.category}
+          </span>
+          {project.area !== '—' && (
+            <span className="text-gray-500 text-xs">{project.area}</span>
+          )}
+        </div>
+        <h3 className="text-white text-sm font-semibold mb-1">{project.title}</h3>
+        <p className="text-gray-500 text-xs leading-relaxed line-clamp-2">{project.desc}</p>
       </div>
     </div>
   )
 }
 
-const SPEED = 1 // px per frame at 60fps
-
 export default function Projects() {
-  const trackRef = useRef(null)
-  const rafRef   = useRef(null)
-  const drag     = useRef({ active: false, startX: 0, scrollStart: 0 })
+  const trackRef  = useRef(null)
+  const rafRef    = useRef(null)
+  const drag      = useRef({ active: false, startX: 0, scrollStart: 0, moved: false })
+  const [selected, setSelected] = useState(null)
 
   useEffect(() => {
     const el = trackRef.current
     if (!el) return
-
     const tick = () => {
       if (!drag.current.active) {
         el.scrollLeft += SPEED
-        // seamless loop: when first set scrolled past, jump back
         if (el.scrollLeft >= el.scrollWidth / 2) {
           el.scrollLeft -= el.scrollWidth / 2
         }
@@ -62,14 +123,15 @@ export default function Projects() {
   }, [])
 
   const startDrag = (x) => {
-    drag.current = { active: true, startX: x, scrollStart: trackRef.current.scrollLeft }
+    drag.current = { active: true, startX: x, scrollStart: trackRef.current.scrollLeft, moved: false }
     trackRef.current.style.cursor = 'grabbing'
   }
 
   const moveDrag = (x) => {
     if (!drag.current.active) return
-    const el = trackRef.current
-    el.scrollLeft = drag.current.scrollStart - (x - drag.current.startX)
+    const dx = x - drag.current.startX
+    if (Math.abs(dx) > CLICK_THRESHOLD) drag.current.moved = true
+    trackRef.current.scrollLeft = drag.current.scrollStart - dx
   }
 
   const endDrag = () => {
@@ -78,10 +140,14 @@ export default function Projects() {
     const el = trackRef.current
     if (!el) return
     el.style.cursor = 'grab'
-    // normalize position into first set so auto-scroll continues seamlessly
     const half = el.scrollWidth / 2
     if (el.scrollLeft >= half) el.scrollLeft -= half
     if (el.scrollLeft < 0)    el.scrollLeft += half
+  }
+
+  // Клік по картці спрацьовує тільки якщо не було drag
+  const handleCardClick = (project) => {
+    if (!drag.current.moved) setSelected(project)
   }
 
   return (
@@ -93,7 +159,7 @@ export default function Projects() {
           <span className="text-brand-yellow text-sm font-semibold uppercase tracking-widest">Портфоліо</span>
           <h2 className="section-heading mt-2">Наші проєкти</h2>
           <p className="section-subheading mx-auto">
-            Декілька прикладів виконаних робіт. Усі об'єкти здані вчасно та прийняті замовниками без зауважень.
+            Натисніть на кейс, щоб дізнатися більше та залишити заявку.
           </p>
         </div>
       </div>
@@ -117,11 +183,16 @@ export default function Projects() {
           onTouchEnd={endDrag}
         >
           {doubled.map((project, i) => (
-            <ProjectCard key={i} project={project} />
+            <ProjectCard
+              key={i}
+              project={project}
+              onClick={() => handleCardClick(project)}
+            />
           ))}
         </div>
       </div>
 
+      <ProjectModal project={selected} onClose={() => setSelected(null)} />
     </section>
   )
 }

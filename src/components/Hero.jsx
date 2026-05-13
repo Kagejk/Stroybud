@@ -56,7 +56,7 @@ export default function Hero({ onOpenModal }) {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 border border-white/20 bg-black/40 text-white text-xs font-semibold px-4 py-2 rounded-full uppercase tracking-widest mb-8">
             <span className="w-2 h-2 bg-brand-yellow rounded-full animate-pulse flex-shrink-0" />
-            Працюємо по всій Україні
+            Працюємо по Київській області та місто Первомайськ
           </div>
 
           {/* Main heading */}

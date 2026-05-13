@@ -53,7 +53,7 @@ export default function About() {
           <div className="relative pb-10 md:pb-8 lg:pb-0">
             <div className="aspect-[4/3] rounded-2xl overflow-hidden border border-brand-muted">
               <img
-                src="/images/Pavers.jpg"
+                src="/images/58.jpg"
                 alt="Власна техніка Стройбуд за роботою"
                 className="w-full h-full object-cover"
               />
