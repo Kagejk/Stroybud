@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 $BOT_TOKEN = '8753558613:AAGOkUWvp6z0Edvp022Qr_cZJ1iyP3Fu7Hk';
-$CHAT_ID   = '-5270004087';
+$CHAT_ID   = '-1003328780057';
 
 $input = json_decode(file_get_contents('php://input'), true);
 if (!is_array($input)) {
