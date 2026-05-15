@@ -1,0 +1,5 @@
+Options -MultiViews
+RewriteEngine On
+RewriteRule ^api/proxy$ proxy.php [L,QSA]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ index.html [QSA,L]

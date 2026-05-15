@@ -3,10 +3,10 @@ import { useState } from 'react'
 const navLinks = [
   { label: 'Послуги',     href: '#services' },
   { label: 'Переваги',    href: '#advantages' },
-  { label: 'Результати',  href: '#projects' },
-  { label: 'Як працюємо', href: '#about' },
+  { label: 'Як працюємо', href: '#steps' },
+  { label: 'До / Після',  href: '#results' },
   { label: 'Портфоліо',   href: '#projects' },
-  { label: 'Відгуки',     href: '#reviews' },
+  { label: 'FAQ',         href: '#faq' },
 ]
 
 export default function Header({ onOpenModal }) {
@@ -19,9 +19,7 @@ export default function Header({ onOpenModal }) {
 
           {/* Logo */}
           <a href="#hero" className="flex items-center gap-3 flex-shrink-0">
-            <div className="w-9 h-9 bg-brand-yellow rounded-sm flex items-center justify-center">
-              <span className="text-brand-dark font-black text-sm tracking-tight">SB</span>
-            </div>
+            <img src="/images/Logo.jpg" alt="Stroybud 58" className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
             <span className="text-white font-bold text-lg tracking-wide">STROYBUD 58</span>
           </a>
 

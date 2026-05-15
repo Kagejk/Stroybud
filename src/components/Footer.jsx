@@ -1,9 +1,10 @@
 const footerLinks = [
   { label: 'Послуги',     href: '#services' },
   { label: 'Переваги',    href: '#advantages' },
-  { label: 'Результати',  href: '#projects' },
-  { label: 'Як працюємо', href: '#about' },
+  { label: 'Як працюємо', href: '#steps' },
+  { label: 'До / Після',  href: '#results' },
   { label: 'Портфоліо',   href: '#projects' },
+  { label: 'FAQ',         href: '#faq' },
 ]
 
 export default function Footer() {
@@ -15,9 +16,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="sm:col-span-2 md:col-span-1">
             <a href="#hero" className="flex items-center gap-3 mb-4">
-              <div className="w-9 h-9 bg-brand-yellow rounded-sm flex items-center justify-center flex-shrink-0">
-                <span className="text-brand-dark font-black text-sm tracking-tight">SB</span>
-              </div>
+              <img src="/images/Logo.jpg" alt="Stroybud 58" className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
               <span className="text-white font-bold text-lg tracking-wide">STROYBUD 58</span>
             </a>
             <p className="text-gray-500 text-sm leading-relaxed max-w-xs">

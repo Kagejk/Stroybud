@@ -21,6 +21,7 @@ export default function InlineLeadForm({ label = 'Залишити заявку'
   return (
     <form onSubmit={handleSubmit} className="mt-10">
       <p className="text-white text-lg font-bold text-center mb-5">{label}</p>
+      <input type="text" name="website" style={{display:'none'}} tabIndex={-1} autoComplete="off" />
       <div className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto">
 
         {/* Name */}

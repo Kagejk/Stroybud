@@ -68,6 +68,7 @@ export default function LeadModal({ isOpen, onClose, serviceName = 'Модаль
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
+              <input type="text" name="website" style={{display:'none'}} tabIndex={-1} autoComplete="off" />
               <input
                 type="text" name="name" value={form.name}
                 onChange={handleChange} required disabled={loading}
